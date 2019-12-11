@@ -11,6 +11,10 @@ HEIGHT=60;
     cylinder(r1=INNER_R_L,r2=INNER_R_U,h=HEIGHT+10);
 }
 
+module round_bar(thickness, width) {
+  rotate([0, 90, 0])
+    cylinder(r=thickness, h=width, center=true);
+}
 
 module spiral(z_step, compression, height, width, spiral_thickness, core_thickness) {
   union() {
@@ -18,14 +22,14 @@ module spiral(z_step, compression, height, width, spiral_thickness, core_thickne
     for (i=[0 : z_step : height*2*compression]) {
       rotate(i*2)
         translate([0, 0, i/compression])
-        cube([spiral_thickness, width, spiral_thickness], true);
+        round_bar(spiral_thickness, width);
     }
   }
 }
 
 difference() {
   union() {
-    spiral(1, 1.3, 200, 100, 5, 5);
+    spiral(1, 1, 200, 100, 5, 5);
     cylinder(r=55,h=10);
   }
   translate([0,0,-10])
