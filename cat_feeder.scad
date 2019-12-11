@@ -12,15 +12,16 @@ HEIGHT=60;
 }
 
 
-module spiral(step, height, width, core) {
+module spiral(step, height, width, spiral_thickness, core_thickness) {
   union() {
-    cylinder(r=core,h=height*2);
+    cylinder(r=core_thickness,h=height*2);
     for (i=[0 : step : height*2]) {
       rotate(i*2)
         translate([0, 0, i])
-        cube([3, width, 3], true);
+        cube([spiral_thickness, width, spiral_thickness], true);
     }
   }
 }
 
-spiral(0.1, 200, 100, 5);
+/* resize([0.5, 0.5, 0.5]) */
+spiral(0.1, 200, 100, 5, 5);
