@@ -119,7 +119,7 @@ module funnel() {/*{{{*/
     translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
       cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
     // arduino placeholder cut off
-    translate([-38,-40, platform_offset+.5])
+    translate([-38,-42, platform_offset+.5])
       arduino_base();
   }
 }/*}}}*/
