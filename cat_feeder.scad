@@ -13,7 +13,11 @@ CONE_LOWER_WIDTH=10;
 CONE_HEIGHT=150;
 
 SERVO_HEAD_R=16;
-SERVO_HEAD_THICKNESS=2;
+SERVO_HEAD_THICKNESS=4;
+SERVO_MOUNT_LENGHT=20;
+SERVO_MOUNT_THICKNESS=12;
+SERVO_WIDTH=24;
+SERVO_OFFSET=5.5;
 
 module 9g_motor(){/*{{{*/
   difference(){
@@ -53,7 +57,7 @@ module spiral_assembly() {/*{{{*/
       cylinder(r=SERVO_HEAD_R,h=SERVO_HEAD_THICKNESS);
     // servo screw cut off
     translate([0,0,0])
-      cylinder(r=3,h=2);
+      cylinder(r=3,h=5);
   }
 }/*}}}*/
 
@@ -66,15 +70,29 @@ module funnel(upper_width, walls) {
 
   cone_height = CONE_HEIGHT*0.6;
   cone_offset = CONE_HEIGHT*0.2;
+
+  mount_offset = -SPIRAL_LENGTH/2;
   color("NavajoWhite")
   difference() {
     union() {
-      // spiral housing
+      // cone outer shell
       translate([0,0,-cone_offset])
         cylinder(r1=outer_r_l,r2=outer_r_u,h=cone_height);
-      // cone outer shell
+      // spiral housing
       translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
         cylinder(r=SPIRAL_R+walls*2, h=SPIRAL_LENGTH, center=true);
+      // servo mount
+      translate([mount_offset,0,-SPIRAL_R])
+        difference() {
+          cube([SERVO_MOUNT_LENGHT, (SPIRAL_R+walls)*2.3, SERVO_MOUNT_THICKNESS], true);
+          // servo mount cut off
+          translate([0, -SERVO_OFFSET, 0])
+            cube([SERVO_MOUNT_LENGHT, SERVO_WIDTH, SERVO_MOUNT_THICKNESS+2], true);
+          // servo mounting holes
+          for ( hole = [14,-14] ){
+            translate([-6,hole-5.5,0]) rotate([0, 90, 0]) cylinder(r=1, h=SERVO_MOUNT_THICKNESS*1.1, $fn=20, center=true);
+          };
+        };
       // bottom platform
       translate([0,0, -SPIRAL_R*4])
         cube([SPIRAL_LENGTH, (SPIRAL_R+walls)*5, walls], true);
@@ -84,7 +102,7 @@ module funnel(upper_width, walls) {
       cylinder(r1=inner_r_l,r2=inner_r_u,h=cone_height+2);
     // spiral housing cut off
     translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
-      cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+20, center=true);
+      cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
   }
 }
 
@@ -93,7 +111,7 @@ translate([0, 0, SPIRAL_R])
 translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
-translate([-SPIRAL_LENGTH/2-20, -5.5, 0])
+translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
 rotate([90, 0, 0])
 rotate([0, 90, 0])
   9g_motor();
