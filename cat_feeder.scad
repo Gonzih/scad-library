@@ -61,7 +61,10 @@ module spiral_assembly() {/*{{{*/
   }
 }/*}}}*/
 
-module funnel(upper_width, walls) {
+module funnel() {
+  upper_width = CONTAINER_WIDTH;
+  walls = WALL_THICKNESS;
+
   inner_r_l = CONE_LOWER_WIDTH;
   inner_r_u = upper_width;
 
@@ -72,6 +75,7 @@ module funnel(upper_width, walls) {
   cone_offset = CONE_HEIGHT*0.2;
 
   mount_offset = -SPIRAL_LENGTH/2;
+  platform_offset = -SPIRAL_R*4;
   color("NavajoWhite")
   difference() {
     union() {
@@ -94,8 +98,14 @@ module funnel(upper_width, walls) {
           };
         };
       // bottom platform
-      translate([0,0, -SPIRAL_R*4])
+      translate([0,0, platform_offset])
         cube([SPIRAL_LENGTH, (SPIRAL_R+walls)*5, walls], true);
+      // stands
+      for (stand = [SPIRAL_LENGTH/2-walls, -SPIRAL_LENGTH/2+walls]) {
+        translate([stand, 0, platform_offset*0.75])
+          cube([walls, SPIRAL_R*2, SPIRAL_R*2], true);
+      }
+
     }
     // cone cut off
     translate([0, 0, -cone_offset])
@@ -107,7 +117,7 @@ module funnel(upper_width, walls) {
 }
 
 translate([0, 0, SPIRAL_R])
-  funnel(CONTAINER_WIDTH, WALL_THICKNESS);
+  funnel();
 translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
