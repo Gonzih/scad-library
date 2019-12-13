@@ -1,19 +1,23 @@
 // 1 unit == 1mm
 
-FN=100;
+FN=30;
+$fn=FN;
 
-WALL_THICKNESS=7;
+PLATFORM_SIZE=110;
+
+WALL_THICKNESS=3;
 SPIRAL_THICKNESS=5;
-SPIRAL_R=25;
-SPIRAL_LENGTH=150;
+SPIRAL_R=22;
+SPIRAL_LENGTH=90;
 SPIRAL_MARGIN=2;
+SPIRAL_CORE_THICKNESS=5;
 
 CONTAINER_WIDTH=80;
 CONE_LOWER_WIDTH=10;
-CONE_HEIGHT=150;
+CONE_HEIGHT=100;
 
 SERVO_HEAD_R=16;
-SERVO_HEAD_THICKNESS=4;
+SERVO_HEAD_THICKNESS=1;
 SERVO_MOUNT_LENGHT=20;
 SERVO_MOUNT_THICKNESS=12;
 SERVO_WIDTH=24;
@@ -39,7 +43,7 @@ module 9g_motor(){/*{{{*/
 module spiral(height, width, spiral_thickness, core_thickness) {/*{{{*/
   union() {
     cylinder(r=core_thickness,h=height);
-    translate([0,0,core_thickness-1])
+    translate([0,0,core_thickness])
     linear_extrude(height=height-core_thickness, convexity=1000, twist=360, $fn=FN)
     square([spiral_thickness, width], true);
   }
@@ -49,7 +53,7 @@ module spiral_assembly() {/*{{{*/
   /* color("ForestGreen") */
   difference() {
     union() {
-      spiral(SPIRAL_LENGTH, SPIRAL_R*2, SPIRAL_THICKNESS, WALL_THICKNESS);
+      spiral(SPIRAL_LENGTH, SPIRAL_R*2, SPIRAL_THICKNESS, SPIRAL_CORE_THICKNESS);
       cylinder(r=SPIRAL_R,h=WALL_THICKNESS);
     }
     // servo attachment cut off
@@ -57,25 +61,25 @@ module spiral_assembly() {/*{{{*/
       cylinder(r=SERVO_HEAD_R,h=SERVO_HEAD_THICKNESS);
     // servo screw cut off
     translate([0,0,0])
-      cylinder(r=3,h=5);
+      cylinder(r=3,h=4);
   }
 }/*}}}*/
 
 module funnel() {
-  upper_width = CONTAINER_WIDTH;
+  upper_width = CONTAINER_WIDTH/2;
   walls = WALL_THICKNESS;
 
-  inner_r_l = CONE_LOWER_WIDTH;
+  inner_r_l = CONE_LOWER_WIDTH/2;
   inner_r_u = upper_width;
 
-  outer_r_l = CONE_LOWER_WIDTH + walls;
+  outer_r_l = CONE_LOWER_WIDTH/2 + walls;
   outer_r_u = upper_width + walls;
 
   cone_height = CONE_HEIGHT*0.6;
   cone_offset = CONE_HEIGHT*0.2;
 
   mount_offset = -SPIRAL_LENGTH/2;
-  platform_offset = -SPIRAL_R*4;
+  platform_offset = -SPIRAL_R*3;
   color("NavajoWhite")
   difference() {
     union() {
@@ -88,7 +92,7 @@ module funnel() {
       // servo mount
       translate([mount_offset,0,-SPIRAL_R])
         difference() {
-          cube([SERVO_MOUNT_LENGHT, (SPIRAL_R+walls)*2.3, SERVO_MOUNT_THICKNESS], true);
+          cube([SERVO_MOUNT_LENGHT, (SPIRAL_R+walls)*2, SERVO_MOUNT_THICKNESS], true);
           // servo mount cut off
           translate([0, -SERVO_OFFSET, 0])
             cube([SERVO_MOUNT_LENGHT, SERVO_WIDTH, SERVO_MOUNT_THICKNESS+2], true);
@@ -99,11 +103,11 @@ module funnel() {
         };
       // bottom platform
       translate([0,0, platform_offset])
-        cube([SPIRAL_LENGTH, (SPIRAL_R+walls)*5, walls], true);
+        cube([PLATFORM_SIZE, PLATFORM_SIZE, walls], true);
       // stands
       for (stand = [SPIRAL_LENGTH/2-walls, -SPIRAL_LENGTH/2+walls]) {
         translate([stand, 0, platform_offset*0.75])
-          cube([walls, SPIRAL_R*2, SPIRAL_R*2], true);
+          cube([walls, SPIRAL_R*2, SPIRAL_R*1.5], true);
       }
 
     }
@@ -121,7 +125,7 @@ translate([0, 0, SPIRAL_R])
 translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
-translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
+* translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
 rotate([90, 0, 0])
 rotate([0, 90, 0])
   9g_motor();
