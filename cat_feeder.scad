@@ -12,9 +12,25 @@ CONTAINER_WIDTH=80;
 CONE_LOWER_WIDTH=10;
 CONE_HEIGHT=150;
 
-SERVO_HEAD_R=10;
-SERVO_HEAD_THICKNESS=1;
+SERVO_HEAD_R=16;
+SERVO_HEAD_THICKNESS=2;
 
+module 9g_motor(){/*{{{*/
+  difference(){
+    union(){
+      color("steelblue") cube([23,12.5,22], center=true);
+      color("steelblue") translate([0,0,5]) cube([32,12,2], center=true);
+      color("steelblue") translate([5.5,0,2.75]) cylinder(r=6, h=25.75, $fn=20, center=true);
+      color("steelblue") translate([-.5,0,2.75]) cylinder(r=1, h=25.75, $fn=20, center=true);
+      color("steelblue") translate([-1,0,2.75]) cube([5,5.6,24.5], center=true);
+      color("white") translate([5.5,0,3.65]) cylinder(r=2.35, h=29.25, $fn=20, center=true);
+    }
+    translate([10,0,-11]) rotate([0,-30,0]) cube([8,13,4], center=true);
+    for ( hole = [14,-14] ){
+      translate([hole,0,5]) cylinder(r=2.2, h=4, $fn=20, center=true);
+    }
+  }
+}/*}}}*/
 
 module spiral(height, width, spiral_thickness, core_thickness) {/*{{{*/
   union() {
@@ -26,6 +42,7 @@ module spiral(height, width, spiral_thickness, core_thickness) {/*{{{*/
 }/*}}}*/
 
 module spiral_assembly() {/*{{{*/
+  /* color("ForestGreen") */
   difference() {
     union() {
       spiral(SPIRAL_LENGTH, SPIRAL_R*2, SPIRAL_THICKNESS, WALL_THICKNESS);
@@ -49,6 +66,7 @@ module funnel(upper_width, walls) {
 
   cone_height = CONE_HEIGHT*0.6;
   cone_offset = CONE_HEIGHT*0.2;
+  color("NavajoWhite")
   difference() {
     union() {
       // spiral housing
@@ -74,3 +92,8 @@ translate([0, 0, SPIRAL_R])
   funnel(CONTAINER_WIDTH, WALL_THICKNESS);
 translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
+
+translate([-SPIRAL_LENGTH/2-20, -5.5, 0])
+rotate([90, 0, 0])
+rotate([0, 90, 0])
+  9g_motor();
