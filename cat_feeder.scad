@@ -1,7 +1,7 @@
 // 1 unit == 1mm
 
-FN=30;
-$fn=FN;
+$fn=50;
+SPIRAL_FN=50;
 
 PLATFORM_SIZE=110;
 
@@ -13,7 +13,7 @@ SPIRAL_MARGIN=2;
 SPIRAL_CORE_THICKNESS=5;
 
 CONTAINER_WIDTH=80;
-CONE_LOWER_WIDTH=10;
+CONE_LOWER_WIDTH=30;
 CONE_HEIGHT=100;
 
 SERVO_HEAD_R=16;
@@ -44,7 +44,7 @@ module spiral(height, width, spiral_thickness, core_thickness) {/*{{{*/
   union() {
     cylinder(r=core_thickness,h=height);
     translate([0,0,core_thickness])
-    linear_extrude(height=height-core_thickness, convexity=1000, twist=360, $fn=FN)
+    linear_extrude(height=height-core_thickness, convexity=1000, twist=360, $fn=SPIRAL_FN)
     square([spiral_thickness, width], true);
   }
 }/*}}}*/
@@ -65,7 +65,7 @@ module spiral_assembly() {/*{{{*/
   }
 }/*}}}*/
 
-module funnel() {
+module funnel() {/*{{{*/
   upper_width = CONTAINER_WIDTH/2;
   walls = WALL_THICKNESS;
 
@@ -104,12 +104,13 @@ module funnel() {
       // bottom platform
       translate([0,0, platform_offset])
         cube([PLATFORM_SIZE, PLATFORM_SIZE, walls], true);
+
       // stands
-      for (stand = [SPIRAL_LENGTH/2-walls, -SPIRAL_LENGTH/2+walls]) {
+      for (stand = [SPIRAL_LENGTH*0.2, -SPIRAL_LENGTH/2+walls]) {
+        echo(stand=stand);
         translate([stand, 0, platform_offset*0.75])
           cube([walls, SPIRAL_R*2, SPIRAL_R*1.5], true);
       }
-
     }
     // cone cut off
     translate([0, 0, -cone_offset])
@@ -117,12 +118,38 @@ module funnel() {
     // spiral housing cut off
     translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
       cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
+    // arduino placeholder cut off
+    translate([-38,-40, platform_offset+.5])
+      arduino_base();
   }
+}/*}}}*/
+
+module arduino_base() {
+  w = 66.1;
+  we = 66.8;
+  h = 53.34;
+  holes = [[  2.54, 15.24 ],
+           [  17.78, 66.04 ],
+           [  45.72, 66.04 ],
+           [  50.8, 13.97 ]];
+  linear_extrude(height=2, center=true)
+    difference() {
+      polygon(points=[[  0.0, 0.0 ],
+                      [  53.34, 0.0 ],
+                      [  53.34, 66.04 ],
+                      [  50.8, 66.04 ],
+                      [  48.26, 68.58 ],
+                      [  15.24, 68.58 ],
+                      [  12.7, 66.04 ],
+                      [  1.27, 66.04 ],
+                      [  0.0, 64.77 ]]);
+      for (p=holes) translate(p) circle(d=3.2);
+    }
 }
 
 translate([0, 0, SPIRAL_R])
   funnel();
-translate([-SPIRAL_LENGTH/2, 0, 0])
+* translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
 * translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
