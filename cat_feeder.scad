@@ -124,7 +124,7 @@ module funnel() {/*{{{*/
   }
 }/*}}}*/
 
-module arduino_base() {
+module arduino_base() {/*{{{*/
   w = 66.1;
   we = 66.8;
   h = 53.34;
@@ -145,7 +145,7 @@ module arduino_base() {
                       [  0.0, 64.77 ]]);
       for (p=holes) translate(p) circle(d=3.2);
     }
-}
+}/*}}}*/
 
 translate([0, 0, SPIRAL_R])
   funnel();
