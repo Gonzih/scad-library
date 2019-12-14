@@ -3,7 +3,8 @@
 $fn=50;
 SPIRAL_FN=50;
 
-PLATFORM_SIZE=110;
+PLATFORM_SIZE_X=70;
+PLATFORM_SIZE_Y=90;
 
 WALL_THICKNESS=3;
 SPIRAL_THICKNESS=5;
@@ -73,10 +74,10 @@ module bottom_platform() {/*{{{*/
   difference() {
     union() {
       // bottom platform
-      translate([0,0, platform_offset])
-        cube([PLATFORM_SIZE, PLATFORM_SIZE, walls], true);
+      translate([-10,0, platform_offset])
+        cube([PLATFORM_SIZE_X, PLATFORM_SIZE_Y, walls], true);
       // stands
-      for (stand = [SPIRAL_LENGTH*0.2, -SPIRAL_LENGTH/2+walls]) {
+      for (stand = [SPIRAL_LENGTH*0.25, -SPIRAL_LENGTH/2+walls]) {
         echo(stand=stand);
         translate([stand, 0, platform_offset*0.75])
           cube([walls, SPIRAL_R*2, SPIRAL_R*1.5], true);
@@ -84,7 +85,7 @@ module bottom_platform() {/*{{{*/
     }
 
     // arduino placeholder cut off
-    translate([-38,-42, platform_offset+.5])
+    translate([-35,-42, platform_offset+.5])
       arduino_base();
     // switch hole
     translate([-SPIRAL_LENGTH/2+3, -SPIRAL_R*0.8, -SPIRAL_R*2.3])
@@ -173,7 +174,7 @@ translate([0, 0, SPIRAL_R])
 translate([0, 0, SPIRAL_R])
   funnel();
 
-translate([-SPIRAL_LENGTH/2, 0, 0])
+* translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
 * translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
