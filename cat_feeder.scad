@@ -121,6 +121,10 @@ module funnel() {/*{{{*/
     // arduino placeholder cut off
     translate([-38,-42, platform_offset+.5])
       arduino_base();
+    // switch hole
+    translate([-SPIRAL_LENGTH/2+3, -SPIRAL_R*0.8, -SPIRAL_R*2.25])
+    rotate([0, 90, 0])
+      cylinder(r=2, h=WALL_THICKNESS*2, center=true);
   }
 }/*}}}*/
 
