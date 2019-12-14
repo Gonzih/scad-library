@@ -5,6 +5,7 @@ SPIRAL_FN=50;
 
 PLATFORM_SIZE_X=70;
 PLATFORM_SIZE_Y=90;
+PLATFORM_HEIGHT=75;
 
 WALL_THICKNESS=3;
 SPIRAL_THICKNESS=5;
@@ -66,32 +67,32 @@ module spiral_assembly() {/*{{{*/
   }
 }/*}}}*/
 
-module bottom_platform() {/*{{{*/
+module bottom_platform(height) {/*{{{*/
   walls = WALL_THICKNESS;
-  platform_offset = -SPIRAL_R*3;
 
-  color("teal")
+  color("pink")
   difference() {
     union() {
       // bottom platform
-      translate([-10,0, platform_offset])
-        cube([PLATFORM_SIZE_X, PLATFORM_SIZE_Y, walls], true);
+      cube([PLATFORM_SIZE_X, PLATFORM_SIZE_Y, walls], true);
       // stands
-      for (stand = [SPIRAL_LENGTH*0.25, -SPIRAL_LENGTH/2+walls]) {
+      for (stand = [PLATFORM_SIZE_X/2-5, -PLATFORM_SIZE_X/2+2]) {
         echo(stand=stand);
-        translate([stand, 0, platform_offset*0.75])
-          cube([walls, SPIRAL_R*2, SPIRAL_R*1.5], true);
+        translate([stand, -SPIRAL_R, 0])
+          cube([walls, SPIRAL_R*2, height]);
       }
     }
 
     // arduino placeholder cut off
-    translate([-35,-42, platform_offset+.5])
+    translate([-27,-34, 0.5])
       arduino_base();
     // switch hole
-    translate([-SPIRAL_LENGTH/2+3, -SPIRAL_R*0.8, -SPIRAL_R*2.3])
+    translate([-PLATFORM_SIZE_X/2+4, -SPIRAL_R*0.8, 15])
     rotate([0, 90, 0])
       cylinder(r=2, h=WALL_THICKNESS*2, center=true);
-    spiral_housing_cylinder();
+    // cut off main housing
+    translate([0, 0, height+10])
+      spiral_housing_cylinder();
   }
 }/*}}}*/
 
@@ -102,7 +103,12 @@ module spiral_housing_cylinder() {/*{{{*/
     cylinder(r=SPIRAL_R+walls*2, h=SPIRAL_LENGTH, center=true);
 }/*}}}*/
 
-module funnel() {/*{{{*/
+module spiral_housing_cutoff_cylinder() {/*{{{*/
+    translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
+      cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
+}/*}}}*/
+
+module main_body() {/*{{{*/
   upper_width = CONTAINER_WIDTH/2;
   walls = WALL_THICKNESS;
 
@@ -141,8 +147,23 @@ module funnel() {/*{{{*/
     translate([0, 0, -cone_offset])
       cylinder(r1=inner_r_l,r2=inner_r_u,h=cone_height+2);
     // spiral housing cut off
-    translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
-      cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
+    spiral_housing_cutoff_cylinder();
+  }
+}/*}}}*/
+
+module funnel() {/*{{{*/
+  length = SPIRAL_LENGTH*0.6;
+
+  color("silver")
+  difference() {
+    translate([length, 0, 0]) rotate([0, 20, 0])
+      difference() {
+        spiral_housing_cylinder();
+        spiral_housing_cutoff_cylinder();
+        cube([SPIRAL_LENGTH+1, SPIRAL_R*3, SPIRAL_R*3], true);
+      }
+
+    spiral_housing_cylinder();
   }
 }/*}}}*/
 
@@ -169,12 +190,14 @@ module arduino_base() {/*{{{*/
     }
 }/*}}}*/
 
+translate([0, 0, -PLATFORM_HEIGHT+12])
+  bottom_platform(PLATFORM_HEIGHT);
 translate([0, 0, SPIRAL_R])
-  bottom_platform();
-translate([0, 0, SPIRAL_R])
+  main_body();
+translate([0, 0, SPIRAL_R-0.5])
   funnel();
 
-* translate([-SPIRAL_LENGTH/2, 0, 0])
+translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
 * translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
