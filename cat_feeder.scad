@@ -50,7 +50,7 @@ module spiral(height, width, spiral_thickness, core_thickness) {/*{{{*/
 }/*}}}*/
 
 module spiral_assembly() {/*{{{*/
-  /* color("ForestGreen") */
+  color("pink")
   difference() {
     union() {
       spiral(SPIRAL_LENGTH, SPIRAL_R*2, SPIRAL_THICKNESS, SPIRAL_CORE_THICKNESS);
@@ -63,6 +63,42 @@ module spiral_assembly() {/*{{{*/
     translate([0,0,0])
       cylinder(r=3,h=4);
   }
+}/*}}}*/
+
+module bottom_platform() {/*{{{*/
+  walls = WALL_THICKNESS;
+  platform_offset = -SPIRAL_R*3;
+
+  color("teal")
+  difference() {
+    union() {
+      // bottom platform
+      translate([0,0, platform_offset])
+        cube([PLATFORM_SIZE, PLATFORM_SIZE, walls], true);
+      // stands
+      for (stand = [SPIRAL_LENGTH*0.2, -SPIRAL_LENGTH/2+walls]) {
+        echo(stand=stand);
+        translate([stand, 0, platform_offset*0.75])
+          cube([walls, SPIRAL_R*2, SPIRAL_R*1.5], true);
+      }
+    }
+
+    // arduino placeholder cut off
+    translate([-38,-42, platform_offset+.5])
+      arduino_base();
+    // switch hole
+    translate([-SPIRAL_LENGTH/2+3, -SPIRAL_R*0.8, -SPIRAL_R*2.3])
+    rotate([0, 90, 0])
+      cylinder(r=2, h=WALL_THICKNESS*2, center=true);
+    spiral_housing_cylinder();
+  }
+}/*}}}*/
+
+module spiral_housing_cylinder() {/*{{{*/
+  // spiral housing
+  walls = WALL_THICKNESS;
+  translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
+    cylinder(r=SPIRAL_R+walls*2, h=SPIRAL_LENGTH, center=true);
 }/*}}}*/
 
 module funnel() {/*{{{*/
@@ -79,16 +115,14 @@ module funnel() {/*{{{*/
   cone_offset = CONE_HEIGHT*0.2;
 
   mount_offset = -SPIRAL_LENGTH/2;
-  platform_offset = -SPIRAL_R*3;
-  color("NavajoWhite")
+  color("palegreen")
   difference() {
     union() {
       // cone outer shell
       translate([0,0,-cone_offset])
         cylinder(r1=outer_r_l,r2=outer_r_u,h=cone_height);
       // spiral housing
-      translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
-        cylinder(r=SPIRAL_R+walls*2, h=SPIRAL_LENGTH, center=true);
+      spiral_housing_cylinder();
       // servo mount
       translate([mount_offset,0,-SPIRAL_R])
         difference() {
@@ -101,16 +135,6 @@ module funnel() {/*{{{*/
             translate([-6,hole-5.5,0]) rotate([0, 90, 0]) cylinder(r=1, h=SERVO_MOUNT_THICKNESS*1.1, $fn=20, center=true);
           };
         };
-      // bottom platform
-      translate([0,0, platform_offset])
-        cube([PLATFORM_SIZE, PLATFORM_SIZE, walls], true);
-
-      // stands
-      for (stand = [SPIRAL_LENGTH*0.2, -SPIRAL_LENGTH/2+walls]) {
-        echo(stand=stand);
-        translate([stand, 0, platform_offset*0.75])
-          cube([walls, SPIRAL_R*2, SPIRAL_R*1.5], true);
-      }
     }
     // cone cut off
     translate([0, 0, -cone_offset])
@@ -118,13 +142,6 @@ module funnel() {/*{{{*/
     // spiral housing cut off
     translate([0,0, -SPIRAL_R]) rotate([0, 90, 0])
       cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
-    // arduino placeholder cut off
-    translate([-38,-42, platform_offset+.5])
-      arduino_base();
-    // switch hole
-    translate([-SPIRAL_LENGTH/2+3, -SPIRAL_R*0.8, -SPIRAL_R*2.3])
-    rotate([0, 90, 0])
-      cylinder(r=2, h=WALL_THICKNESS*2, center=true);
   }
 }/*}}}*/
 
@@ -152,8 +169,11 @@ module arduino_base() {/*{{{*/
 }/*}}}*/
 
 translate([0, 0, SPIRAL_R])
+  bottom_platform();
+translate([0, 0, SPIRAL_R])
   funnel();
-* translate([-SPIRAL_LENGTH/2, 0, 0])
+
+translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
 * translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
