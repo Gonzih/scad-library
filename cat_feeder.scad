@@ -1,6 +1,6 @@
 // 1 unit == 1mm
 
-$fn=50;
+$fn=100;
 SPIRAL_FN=50;
 
 PLATFORM_SIZE_X=70;
@@ -45,8 +45,8 @@ module 9g_motor(){/*{{{*/
 module spiral(height, width, spiral_thickness, core_thickness) {/*{{{*/
   union() {
     cylinder(r=core_thickness,h=height);
-    translate([0,0,core_thickness])
-    linear_extrude(height=height-core_thickness, convexity=1000, twist=360, $fn=SPIRAL_FN)
+    translate([0,0, WALL_THICKNESS])
+    linear_extrude(height=height-WALL_THICKNESS, convexity=1000, twist=360, $fn=SPIRAL_FN)
     square([spiral_thickness, width], true);
   }
 }/*}}}*/
@@ -190,17 +190,23 @@ module arduino_base() {/*{{{*/
     }
 }/*}}}*/
 
-translate([0, 0, -PLATFORM_HEIGHT+12])
-  bottom_platform(PLATFORM_HEIGHT);
-translate([0, 0, SPIRAL_R])
-  main_body();
-translate([0, 0, SPIRAL_R-0.5])
-  funnel();
+union() {
+  translate([0, 0, -PLATFORM_HEIGHT+12])
+    bottom_platform(PLATFORM_HEIGHT);
+  translate([0, 0, SPIRAL_R])
+    main_body();
+  translate([0, 0, SPIRAL_R-0.5])
+    funnel();
+}
 
 translate([-SPIRAL_LENGTH/2, 0, 0])
   rotate([0, 90, 0]) spiral_assembly();
 
-* translate([-SPIRAL_LENGTH/2-16, -5.5, 0])
-rotate([90, 0, 0])
-rotate([0, 90, 0])
+* translate([-SPIRAL_LENGTH/2-16, -5.5, 0]) rotate([90, 0, 0]) rotate([0, 90, 0])
   9g_motor();
+
+* bottom_platform(PLATFORM_HEIGHT);
+* main_body();
+* rotate([0, 160, 0])
+  funnel();
+* spiral_assembly();
