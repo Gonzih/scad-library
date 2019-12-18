@@ -22,7 +22,7 @@ SERVO_HEAD_R=16;
 SERVO_HEAD_THICKNESS=1;
 SERVO_MOUNT_LENGHT=20;
 SERVO_MOUNT_THICKNESS=12;
-SERVO_WIDTH=24;
+SERVO_WIDTH=25;
 SERVO_OFFSET=5.5;
 
 module 9g_motor(){/*{{{*/
@@ -89,7 +89,7 @@ module bottom_platform(height) {/*{{{*/
     // switch hole
     translate([-PLATFORM_SIZE_X/2+4, -SPIRAL_R*0.8, 15])
     rotate([0, 90, 0])
-      cylinder(r=2, h=WALL_THICKNESS*2, center=true);
+      cylinder(r=3, h=WALL_THICKNESS*2, center=true);
     // cut off main housing
     translate([0, 0, height+10])
       spiral_housing_cylinder();
@@ -178,18 +178,19 @@ module arduino_base() {/*{{{*/
   linear_extrude(height=2, center=true)
     difference() {
       polygon(points=[[  0.0, 0.0 ],
-                      [  53.34, 0.0 ],
-                      [  53.34, 66.04 ],
+                      [  53.5, 0.0 ],
+                      [  53.5, 66.04 ],
                       [  50.8, 66.04 ],
                       [  48.26, 68.58 ],
                       [  15.24, 68.58 ],
                       [  12.7, 66.04 ],
                       [  1.27, 66.04 ],
                       [  0.0, 64.77 ]]);
-      for (p=holes) translate(p) circle(d=3.2);
+      for (p=holes) translate(p) circle(d=2);
     }
 }/*}}}*/
 
+// DEMO
 union() {
   translate([0, 0, -PLATFORM_HEIGHT+12])
     bottom_platform(PLATFORM_HEIGHT);
@@ -197,13 +198,12 @@ union() {
     main_body();
   translate([0, 0, SPIRAL_R-0.5])
     funnel();
+  translate([-SPIRAL_LENGTH/2, 0, 0])
+    rotate([0, 90, 0]) spiral_assembly();
+  translate([-SPIRAL_LENGTH/2-16, -5.5, 0]) rotate([90, 0, 0]) rotate([0, 90, 0])
+  9g_motor();
 }
 
-translate([-SPIRAL_LENGTH/2, 0, 0])
-  rotate([0, 90, 0]) spiral_assembly();
-
-* translate([-SPIRAL_LENGTH/2-16, -5.5, 0]) rotate([90, 0, 0]) rotate([0, 90, 0])
-  9g_motor();
 
 * bottom_platform(PLATFORM_HEIGHT);
 * main_body();
