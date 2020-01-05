@@ -108,6 +108,30 @@ module spiral_housing_cutoff_cylinder() {/*{{{*/
       cylinder(r=SPIRAL_R+SPIRAL_MARGIN, h=SPIRAL_LENGTH+1, center=true);
 }/*}}}*/
 
+module servo_mount_brackets() {/*{{{*/
+  walls = WALL_THICKNESS;
+
+  intersection() {
+      difference() {
+        union() {
+          // cube([SERVO_MOUNT_LENGHT, (SPIRAL_R+walls)*2, SERVO_MOUNT_THICKNESS], true);
+          translate([16, -SERVO_OFFSET, 0])
+            scale([1, 2, 2])
+            sphere(SPIRAL_R+walls*2);
+        }
+        // servo mount cut off
+        translate([0, -SERVO_OFFSET, 0])
+          cube([SERVO_MOUNT_LENGHT*10, SERVO_WIDTH, SERVO_MOUNT_THICKNESS*10], true);
+        // servo mounting holes
+        for ( hole = [14,-14] ){
+          translate([-6,hole-5.5,0]) rotate([0, 90, 0]) cylinder(r=1, h=SERVO_MOUNT_THICKNESS*10, $fn=20, center=true);
+        };
+      };
+    translate([0,0,SPIRAL_R])
+     spiral_housing_cylinder();
+  };
+}/*}}}*/
+
 module main_body() {/*{{{*/
   upper_width = CONTAINER_WIDTH/2;
   walls = WALL_THICKNESS;
@@ -132,16 +156,7 @@ module main_body() {/*{{{*/
       spiral_housing_cylinder();
       // servo mount
       translate([mount_offset,0,-SPIRAL_R])
-        difference() {
-          cube([SERVO_MOUNT_LENGHT, (SPIRAL_R+walls)*2, SERVO_MOUNT_THICKNESS], true);
-          // servo mount cut off
-          translate([0, -SERVO_OFFSET, 0])
-            cube([SERVO_MOUNT_LENGHT, SERVO_WIDTH, SERVO_MOUNT_THICKNESS+2], true);
-          // servo mounting holes
-          for ( hole = [14,-14] ){
-            translate([-6,hole-5.5,0]) rotate([0, 90, 0]) cylinder(r=1, h=SERVO_MOUNT_THICKNESS*1.1, $fn=20, center=true);
-          };
-        };
+        servo_mount_brackets();
     }
     // cone cut off
     translate([0, 0, -cone_offset])
@@ -191,7 +206,7 @@ module arduino_base() {/*{{{*/
 }/*}}}*/
 
 // DEMO
-union() {
+* union() {
   translate([0, 0, -PLATFORM_HEIGHT+12])
     bottom_platform(PLATFORM_HEIGHT);
   translate([0, 0, SPIRAL_R])
@@ -206,7 +221,8 @@ union() {
 
 
 * bottom_platform(PLATFORM_HEIGHT);
-* main_body();
+main_body();
+* servo_mount_brackets();
 * rotate([0, 160, 0])
   funnel();
 * spiral_assembly();
