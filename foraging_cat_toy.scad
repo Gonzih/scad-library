@@ -1,4 +1,4 @@
-DEBUG=false;
+DEBUG=true;
 
 $fn = DEBUG ? 30 : 100;
 
