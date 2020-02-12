@@ -1,7 +1,6 @@
 DEBUG=true;
 
-$fn = DEBUG ? 30 : 200;
-$fn = 200;
+$fn = DEBUG ? 30 : 80;
 
 WALL_THICKNESS = 3;
 EXTERNAL_RADIUS = 50;
@@ -26,8 +25,9 @@ module main_sphere() {
 }
 
 module lip_hole() {
-    cylinder(r=MAIN_HOLE_RADIUS, h=LIP_HEIGHT);
+  cylinder(r=MAIN_HOLE_RADIUS, h=LIP_HEIGHT);
 }
+
 module lip() {
   difference() {
     cylinder(r2=MAIN_HOLE_RADIUS+WALL_THICKNESS, r1=MAIN_HOLE_RADIUS*3+WALL_THICKNESS, h=LIP_HEIGHT);
