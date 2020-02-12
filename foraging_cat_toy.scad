@@ -1,5 +1,8 @@
 DEBUG=true;
 
+$fn = DEBUG ? 30 : 200;
+$fn = 200;
+
 WALL_THICKNESS = 3;
 EXTERNAL_RADIUS = 50;
 DECOY_HOLE_RADIUS=4.5;
