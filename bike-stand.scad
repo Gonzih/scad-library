@@ -1,6 +1,7 @@
 MM_IN_INCH = 25.4;
 BEAM_WIDTH = 2*MM_IN_INCH;
 BEAM_THICKNESS = 4*MM_IN_INCH;
+WALL_HEIGHT = 2250;
 
 
 module w2x4(length) {
@@ -42,7 +43,7 @@ module corner_stand(height, stand_width, sep_distance) {
   }
 }
 
-corner_stand(1000, 400, 2 * BEAM_THICKNESS);
+corner_stand(WALL_HEIGHT, 600, 2 * BEAM_THICKNESS);
 
 translate([0, 1000, 0])
-  wall_stand(1000, 600, 2 * BEAM_THICKNESS);
+  wall_stand(WALL_HEIGHT, 700, 2 * BEAM_THICKNESS);
